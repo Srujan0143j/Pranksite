@@ -1,115 +1,134 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Android Security Breach</title>
+<title>Android Critical Breach</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
+
 body{
 margin:0;
-overflow:hidden;
 background:black;
-color:#00ffb3;
+color:#00ffea;
 font-family:monospace;
-}
-
-/* MATRIX BACKGROUND */
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-}
-
-/* HEADER */
-.header{
-background:#010101;
-color:#00ffbf;
-padding:12px;
-text-align:center;
-border-bottom:2px solid #00ff9c;
-letter-spacing:1px;
-text-shadow:0 0 8px #00ffd5;
-}
-
-/* TERMINAL */
-.console{
-height:55vh;
 overflow:hidden;
-padding:15px;
 }
 
-.line{
-opacity:0;
-animation:show .2s forwards;
-margin:6px 0;
+/******** HEADER ********/
+.header{
+background:#000;
+color:#00ffee;
+padding:14px;
+text-align:center;
+letter-spacing:1px;
+border-bottom:3px solid red;
+font-weight:bold;
+text-shadow:0 0 10px cyan;
 }
 
-@keyframes show{
-from{opacity:0;transform:translateY(5px);}
-to{opacity:1;transform:translateY(0);}
-}
-
-.glow{
-color:#00ffbf;
-text-shadow:0 0 10px #00ffd5;
-}
-
-/* WARNING BAR */
+/******** ALERT ********/
 .alert{
 text-align:center;
 font-size:18px;
 color:#ff0033;
-margin-top:5px;
+margin-top:6px;
 animation:blink 1s infinite;
-text-shadow:0 0 12px red;
+letter-spacing:1px;
+text-shadow:0 0 20px red;
+}
+@keyframes blink{50%{opacity:0;}}
+
+/******** MATRIX BG ********/
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-2;
 }
 
-@keyframes blink{
-50%{opacity:0;}
-}
-
-/* RADAR SCAN */
-.radar-box{
-width:200px;
-height:200px;
-border:3px solid #00ff9c;
+/******** RADAR ********/
+.radarWrap{
+width:260px;
+height:260px;
+margin:12px auto;
 border-radius:50%;
-margin:10px auto;
+border:3px solid #00ffe6;
+box-shadow:0 0 25px #00ffee;
 position:relative;
 overflow:hidden;
-box-shadow:0 0 10px #00ffbf;
 }
 
 .radar{
 width:100%;
 height:100%;
 background:conic-gradient(
-rgba(0,255,180,.4),
-transparent 60%
-);
-animation:spin 2s linear infinite;
+rgba(0,255,230,.5),
+transparent 65%);
+animation:rot 1.6s linear infinite;
 }
 
-@keyframes spin{
+@keyframes rot{
 to{transform:rotate(360deg);}
 }
 
-/* PROGRESS BAR */
+/******** TARGET DOTS ********/
+.dot{
+position:absolute;
+width:10px;
+height:10px;
+background:red;
+border-radius:50%;
+box-shadow:0 0 10px red;
+}
+
+/******** CONSOLE ********/
+.console{
+height:48vh;
+overflow:hidden;
+padding:10px 15px;
+}
+
+.line{
+opacity:0;
+animation:show .2s forwards;
+margin:4px 0;
+}
+@keyframes show{
+from{opacity:0;transform:translateY(6px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+.green{color:#00ffe6;}
+.yellow{color:yellow;}
+.red{color:#ff0033;}
+
+/******** PROGRESS ********/
 .barBox{
-width:90%;
-border:2px solid #00ffbf;
-margin:15px auto;
-height:22px;
+width:92%;
+border:2px solid #00ffee;
+margin:10px auto;
+height:24px;
 border-radius:6px;
 overflow:hidden;
+box-shadow:0 0 15px #00ffee inset;
 }
 
 #bar{
 height:100%;
 width:0%;
-background:linear-gradient(90deg,#ff0033,#ff0000);
-box-shadow:0 0 20px red inset;
+background:linear-gradient(90deg,#ff0000,#ff2a00);
+}
+
+/******** SCREEN SHAKE ********/
+.shake{
+animation:shake .2s infinite;
+}
+@keyframes shake{
+0%{transform:translate(1px,1px);}
+25%{transform:translate(-1px,2px);}
+50%{transform:translate(2px,-1px);}
+75%{transform:translate(-2px,1px);}
+100%{transform:translate(1px,-2px);}
 }
 
 </style>
@@ -120,13 +139,18 @@ box-shadow:0 0 20px red inset;
 <canvas id="matrix"></canvas>
 
 <div class="header">
-ANDROID SECURITY • CRITICAL DEVICE BREACH MODE
+ANDROID SECURITY CORE • DEVICE CRITICAL BREACH MODE
 </div>
 
-<p class="alert">CRITICAL WARNING — DEVICE COMPROMISED</p>
+<p class="alert">
+⚠ SEVERE RISK: UNAUTHORIZED SYSTEM CONTROL DETECTED ⚠
+</p>
 
-<div class="radar-box">
+<div class="radarWrap">
 <div class="radar"></div>
+<div class="dot" id="d1"></div>
+<div class="dot" id="d2"></div>
+<div class="dot" id="d3"></div>
 </div>
 
 <div class="console" id="console"></div>
@@ -136,56 +160,68 @@ ANDROID SECURITY • CRITICAL DEVICE BREACH MODE
 </div>
 
 <script>
-/******** MATRIX BACKGROUND *********/
+
+/******** MATRIX BACKGROUND ********/
 const c=document.getElementById("matrix");
 const ctx=c.getContext("2d");
-c.height=window.innerHeight;
-c.width=window.innerWidth;
+c.height=innerHeight;
+c.width=innerWidth;
 let chars="01";
 chars=chars.split("");
-let font=14;
-let columns=c.width/font;
+let fontSize=14;
+let columns=c.width/fontSize;
 let drops=[];
-for(let x=0;x<columns;x++) drops[x]=1;
+for(let i=0;i<columns;i++) drops[i]=1;
 
 function draw(){
 ctx.fillStyle="rgba(0,0,0,0.08)";
 ctx.fillRect(0,0,c.width,c.height);
-ctx.fillStyle="#00ff9c";
-ctx.font=font+"px monospace";
+ctx.fillStyle="#00ffee";
+ctx.font=fontSize+"px monospace";
 for(let i=0;i<drops.length;i++){
 let text=chars[Math.floor(Math.random()*chars.length)];
-ctx.fillText(text,i*font,drops[i]*font);
-if(drops[i]*font>c.height && Math.random()>0.95)
+ctx.fillText(text,i*fontSize,drops[i]*fontSize);
+if(drops[i]*fontSize>c.height && Math.random()>0.95)
 drops[i]=0;
 drops[i]++;
 }
 }
-setInterval(draw,35);
+setInterval(draw,30);
 
+/******** MOVING TARGETS ********/
+function moveDot(dot){
+setInterval(()=>{
+dot.style.top=Math.random()*180+30+"px";
+dot.style.left=Math.random()*180+30+"px";
+},500);
+}
 
-/******** TERMINAL LOGS *********/
-let logs = [
-"[BOOT] Secure kernel verified",
-"[SYSTEM] Enforcing SELinux policies",
-"[SECURITY] Launching advanced threat scan",
-"[ACCESS] Requesting elevated shell privileges",
-"[ACCESS] Root privileges confirmed",
-"[SCAN] Inspecting /system partition integrity...",
-"[SCAN] Monitoring runtime activities...",
-"[PROCESS] Detecting suspicious background tasks...",
-"[NETWORK] Mapping IP / IMEI / MAC",
-"[NETWORK] Capturing encrypted traffic packets",
-"[AUTH] Bypassing Google Play Protect",
-"[SECURITY] Validating trust certificates",
-"[DATA] Accessing credential vault",
-"[STORAGE] Reading device storage sectors",
-"[MEDIA] Scanning hidden media cache",
-"[SIM] Extracting SIM authentication key",
-"[SYSTEM] Security framework override detected",
-"[SECURITY] Live threat detected",
-"[SYSTEM] Initiating lockdown protocol",
-"[STATUS] DEVICE BREACH CONFIRMED"
+moveDot(d1);
+moveDot(d2);
+moveDot(d3);
+
+/******** LOGS ********/
+let logs=[
+"[CORE] Initializing secure kernel environment",
+"[SYSTEM] Enforcing SELinux ✓",
+"[SECURITY] Advanced threat protocol enabled",
+"[AUTH] Elevating privileges > SU ACCESS GRANTED",
+"[SCAN] Deep scanning /system framework files",
+"[TRACE] Monitoring suspicious runtime services",
+"[NETWORK] Mapping IP • DEVICE • LOCATION",
+"[CAPTURE] Intercepting encrypted traffic packets",
+"[AUTH] Google Play Protect override SUCCESS",
+"[VAULT] Opening credential storage engine",
+"[DATA] Extracting authentication keys",
+"[SIM] Reading SIM & IMSI security identity",
+"[SECURITY] Injecting security hooks",
+"[CORE] System trust validation FAILED",
+"[THREAT] Live attacker detected in active memory",
+"[NETWORK] Live channel hijack success",
+"[SYSTEM] Android OS control override ENABLED",
+"[LOCKDOWN] User protection restrictions disabled",
+"[BREACH] Device integrity compromised",
+"[STATUS] FULL DEVICE TAKEOVER COMPLETE"
 ];
 
 let consoleBox=document.getElementById("console");
@@ -194,13 +230,17 @@ let i=0;
 let percent=0;
 
 let beep=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-system-beep-buzzer-fail-2964.mp3");
-beep.volume=0.6;
+beep.volume=0.7;
 
+let intense=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-security-facility-breach-alarm-994.mp3");
+intense.volume=1;
+
+/******** RUN ********/
 let seq=setInterval(()=>{
 
 if(i<logs.length){
 let div=document.createElement("div");
-div.className="line glow";
+div.className="line green";
 div.innerHTML=logs[i];
 consoleBox.appendChild(div);
 consoleBox.scrollTop=consoleBox.scrollHeight;
@@ -208,7 +248,7 @@ consoleBox.scrollTop=consoleBox.scrollHeight;
 beep.currentTime=0;
 beep.play().catch(()=>{});
 
-if(navigator.vibrate) navigator.vibrate(120);
+if(navigator.vibrate) navigator.vibrate(150);
 
 i++;
 }
@@ -216,7 +256,16 @@ i++;
 percent+=3;
 bar.style.width=percent+"%";
 
-},180);
+/*** FINAL INTENSE MODE ***/
+if(percent>85){
+document.body.classList.add("shake");
+intense.play().catch(()=>{});
+
+if(navigator.vibrate)
+navigator.vibrate([300,200,300,200,500,200,500]);
+}
+
+},170);
 
 </script>
 
