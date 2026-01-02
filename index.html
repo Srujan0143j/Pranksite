@@ -59,8 +59,8 @@ text-shadow:0 0 10px #00ffd5;
 .alert{
 text-align:center;
 font-size:18px;
-color:#ff0033;
 margin-top:5px;
+color:#ff0033;
 animation:blink 1s infinite;
 text-shadow:0 0 12px red;
 }
@@ -108,8 +108,8 @@ overflow:hidden;
 #bar{
 height:100%;
 width:0%;
-background:linear-gradient(90deg,#ff0033,#ff0000);
-box-shadow:0 0 20px red inset;
+background:linear-gradient(90deg,#00ff6a,#00ffaa);
+box-shadow:0 0 20px #00ff6a inset;
 }
 
 </style>
@@ -165,6 +165,7 @@ setInterval(draw,35);
 
 
 /******** TERMINAL LOGS *********/
+// Your realistic hacking lines + extra lines
 let logs = [
 "Connecting to device...",
 "Injecting malware...",
@@ -174,7 +175,7 @@ let logs = [
 "Uploading contacts...",
 "Encrypting Storage...",
 "SIM Deactivation Started...",
-"Almost Done..."
+"Almost Done...",
 "[BOOT] Secure kernel verified",
 "[SYSTEM] Enforcing SELinux policies",
 "[SECURITY] Launching advanced threat scan",
@@ -222,8 +223,8 @@ if(navigator.vibrate) navigator.vibrate(120);
 i++;
 }
 
-percent+=3;
-bar.style.width=percent+"%";
+percent += Math.floor(100/logs.length);
+bar.style.width=percent + "%";
 
 },180);
 
