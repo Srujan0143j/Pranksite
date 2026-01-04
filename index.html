@@ -1,206 +1,238 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Security Alert</title>
+<title>Android Security Scan</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
 body{
-  background:black;
-  margin:0;
-  font-family:monospace;
-  color:#ff3b3b;
-  overflow:hidden;
+margin:0;
+overflow:hidden;
+background:black;
+color:#00ffb3;
+font-family:monospace;
 }
 
-/* Flashing Red Header */
-.alert-header{
-  text-align:center;
-  padding:12px;
-  font-size:20px;
-  font-weight:bold;
-  background:#150000;
-  border-bottom:2px solid red;
-  animation:flash 1s infinite;
-}
-@keyframes flash{
-  0%{color:#ff0000}
-  50%{color:#ff7b7b}
-  100%{color:#ff0000}
+/* MATRIX BACKGROUND */
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
 }
 
-/* Pulse Border Box */
-.box{
-  border:2px solid red;
-  width:85%;
-  margin:30px auto;
-  border-radius:10px;
-  padding:20px;
-  box-shadow:0 0 25px red;
-  animation:pulse 1.3s infinite;
-}
-@keyframes pulse{
-  0%{box-shadow:0 0 10px red;}
-  50%{box-shadow:0 0 40px red;}
-  100%{box-shadow:0 0 10px red;}
+/* HEADER */
+.header{
+background:#010101;
+color:#00ffbf;
+padding:12px;
+text-align:center;
+border-bottom:2px solid #00ff9c;
+letter-spacing:1px;
+text-shadow:0 0 8px #00ffd5;
+font-weight:bold;
 }
 
-/* Terminal */
-.terminal{
-  background:#0c0000;
-  border:1px solid red;
-  height:200px;
-  overflow:hidden;
-  padding:10px;
-  font-size:14px;
-  color:#ff9090;
+/* WARNING */
+.alert{
+text-align:center;
+font-size:18px;
+color:#ff0033;
+margin-top:5px;
+animation:blink 1s infinite;
+text-shadow:0 0 12px red;
+font-weight:bold;
 }
 
-/* Progress */
-.progress{
-  width:90%;
-  background:#240000;
-  border-radius:20px;
-  margin:20px auto;
-}
-.bar{
-  width:2%;
-  height:18px;
-  background:red;
-  border-radius:20px;
-  transition:0.3s;
+@keyframes blink{
+50%{opacity:0;}
 }
 
-/* Final Reveal */
-.hidden{display:none;}
-.final-title{
-  font-size:30px;
-  color:white;
+/* RADAR */
+.radar-box{
+width:220px;
+height:220px;
+border:3px solid #00ff9c;
+border-radius:50%;
+margin:8px auto;
+position:relative;
+overflow:hidden;
+box-shadow:0 0 15px #00ffbf;
 }
-.prank{
-  font-size:20px;
-  color:#ffcc00;
+
+.radar{
+width:100%;
+height:100%;
+background:conic-gradient(
+rgba(0,255,180,.4),
+transparent 60%
+);
+animation:spin 1.5s linear infinite;
 }
-button{
-  background:red;
-  border:none;
-  padding:10px 18px;
-  border-radius:8px;
-  color:white;
-  font-weight:bold;
+
+@keyframes spin{
+to{transform:rotate(360deg);}
 }
-.siren{
-  animation:glow 0.8s infinite;
+
+/* TERMINAL */
+.console{
+height:42vh;
+overflow-y:hidden;
+padding:15px;
 }
-@keyframes glow{
-  0%{text-shadow:0 0 10px red;}
-  50%{text-shadow:0 0 40px red;}
-  100%{text-shadow:0 0 10px red;}
+
+.line{
+opacity:0;
+animation:show .15s forwards;
+margin:6px 0;
 }
+
+@keyframes show{
+from{opacity:0;transform:translateY(6px);}
+to{opacity:1;transform:translateY(0);}
+}
+
+/* PROGRESS */
+.barBox{
+width:92%;
+border:2px solid #00ffbf;
+margin:12px auto;
+height:24px;
+border-radius:6px;
+overflow:hidden;
+}
+
+#bar{
+height:100%;
+width:0%;
+background:linear-gradient(90deg,#ff0033,#ff0000);
+box-shadow:0 0 20px red inset;
+}
+
+/* FINAL PRANK */
+.finalBox{
+display:none;
+text-align:center;
+margin-top:20px;
+font-size:22px;
+color:yellow;
+text-shadow:0 0 8px yellow;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="alert-header siren">
-⚠ SECURITY ALERT • SYSTEM ACTIVITY DETECTED ⚠
+<canvas id="matrix"></canvas>
+
+<div class="header">
+ANDROID SECURITY • HIGH PRIORITY SCAN
 </div>
 
-<div class="box" id="scanBox">
+<p class="alert">SYSTEM SECURITY SCAN IN PROGRESS</p>
 
-<h2 style="text-align:center;color:white;">
-🔴 Processing System Activity...
-</h2>
-
-<div class="terminal" id="terminal"></div>
-
-<div class="progress">
-  <div class="bar" id="bar"></div>
+<div class="radar-box">
+<div class="radar"></div>
 </div>
 
-<h2 id="status" style="text-align:center;">Initializing...</h2>
+<div class="console" id="console"></div>
+
+<div class="barBox">
+<div id="bar"></div>
 </div>
 
-<div id="reveal" class="hidden" style="text-align:center;margin-top:40px;">
-<div class="final-title">🎉 RELAX! YOU GOT PRANKED 😄</div>
-<p class="prank">
-This was only a harmless visual prank animation.  
-No scanning • No access • Nothing happened 😊
-</p>
-<button onclick="location.reload()">Run Again</button>
+<div class="finalBox" id="final">
+🎉 RELAX! NOTHING WAS HACKED 😂<br>
+THIS WAS JUST A FUN PRANK 😎<br>
+YOUR DEVICE IS 100% SAFE 💚
 </div>
-
-<!-- Alarm -->
-<audio id="alarm" loop>
-<source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" type="audio/ogg">
-</audio>
 
 <script>
-let terminal = document.getElementById("terminal");
-let bar = document.getElementById("bar");
-let statusTxt = document.getElementById("status");
-let alarm = document.getElementById("alarm");
+/******** MATRIX BACKGROUND *********/
+const c=document.getElementById("matrix");
+const ctx=c.getContext("2d");
+c.height=window.innerHeight;
+c.width=window.innerWidth;
+let chars="01";
+chars=chars.split("");
+let font=14;
+let columns=c.width/font;
+let drops=[];
+for(let x=0;x<columns;x++) drops[x]=1;
 
-let lines = [
-"Initializing security modules...",
-"Syncing visual logs...",
-"Activating monitoring frames...",
-"Checking animation packets...",
-"Running display simulation...",
-"Rendering alert graphics...",
-"Finalizing alert sequence..."
+function draw(){
+ctx.fillStyle="rgba(0,0,0,0.08)";
+ctx.fillRect(0,0,c.width,c.height);
+ctx.fillStyle="#00ff9c";
+ctx.font=font+"px monospace";
+for(let i=0;i<drops.length;i++){
+let text=chars[Math.floor(Math.random()*chars.length)];
+ctx.fillText(text,i*font,drops[i]*font);
+if(drops[i]*font>c.height && Math.random()>0.95)
+drops[i]=0;
+drops[i]++;
+}
+}
+setInterval(draw,30);
+
+/******** TERMINAL *********/
+let logs = [
+"[SYSTEM] Initializing secure environment...",
+"[SECURITY] Running high speed scan...",
+"[SCAN] Checking installed applications...",
+"[PROCESS] Monitoring live activities...",
+"[NETWORK] Checking internet connections...",
+"[SYSTEM] Verifying safety status...",
+"[DATA] Checking files integrity...",
+"[SECURITY] No real threats detected",
+"[STATUS] DEVICE IS SAFE",
+"[LOG] Completing scan...",
+"[RESULT] Scan finished successfully 🎯",
+"[INFO] Preparing final result..."
 ];
 
-let index = 0;
-let progress = 2;
+let consoleBox=document.getElementById("console");
+let bar=document.getElementById("bar");
+let final=document.getElementById("final");
 
-// Typing Effect
-function typeLine(text){
- let i = 0;
- let typer = setInterval(()=>{
-   terminal.innerHTML += text[i];
-   i++;
-   terminal.scrollTop = terminal.scrollHeight;
-   if(i === text.length){
-     clearInterval(typer);
-     terminal.innerHTML += "<br>";
-   }
- },40);
-}
+let i=0;
+let percent=0;
 
-alarm.volume = 1;
+let beep=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-system-beep-buzzer-fail-2964.mp3");
+beep.volume=0.5;
+
+let alarm=new Audio("https://assets.mixkit.co/sfx/preview/mixkit-warning-alarm-buzzer-991.mp3");
+alarm.volume=0.4;
+alarm.loop=true;
 alarm.play().catch(()=>{});
 
-// MAIN LOOP
-let process = setInterval(()=>{
- if(index < lines.length){
-   typeLine("> " + lines[index]);
-   index++;
-   progress += 12;
-   bar.style.width = progress + "%";
-   statusTxt.innerText = "Processing... " + progress + "%";
+let run=setInterval(()=>{
 
-   if(navigator.vibrate){
-     navigator.vibrate([150,80,150]);
-   }
- }
+if(i<logs.length){
+let div=document.createElement("div");
+div.className="line";
+div.innerHTML=logs[i];
+consoleBox.appendChild(div);
+consoleBox.scrollTop=consoleBox.scrollHeight;
+beep.currentTime=0;
+beep.play().catch(()=>{});
+i++;
+}
 
- if(progress >= 98){
-   clearInterval(process);
-   statusTxt.innerText = "Finishing sequence...";
+percent+=7;
+bar.style.width=percent+"%";
 
-   setTimeout(()=>{
-      alarm.pause();
-      if(navigator.vibrate){
-        navigator.vibrate([300,200,300,200,400]);
-      }
-      document.getElementById("scanBox").classList.add("hidden");
-      document.getElementById("reveal").classList.remove("hidden");
-   },2000);
- }
+if(navigator.vibrate) navigator.vibrate(100);
 
-},1200);
+if(percent>=100){
+clearInterval(run);
+alarm.pause();
+final.style.display="block";
+if(navigator.vibrate) navigator.vibrate([300,200,300]);
+}
+
+},120);
 </script>
 
 </body>
